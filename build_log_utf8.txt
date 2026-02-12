@@ -5,72 +5,30 @@
 Γû▓ Next.js 16.1.6 (Turbopack)
 - Environments: .env
 
-node.exe : ΓÜá The "middleware" 
-file convention is deprecated. 
-Please use "proxy" instead. 
-Learn more: https://nextjs.org/d
-ocs/messages/middleware-to-proxy
+node.exe : ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn 
+more: https://nextjs.org/docs/messages/middleware-to-proxy
 At line:1 char:1
-+ & "C:\Program 
-Files\nodejs/node.exe" 
-"C:\Program 
-Files\nodejs/node_mo ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~
-    + CategoryInfo          : N 
-   otSpecified: (ΓÜá The "midd  
-  le...leware-to-proxy:String   
- ) [], RemoteException
-    + FullyQualifiedErrorId : N 
-   ativeCommandError
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ΓÜá The "middle...leware-to-proxy:String) [], RemoteE 
+   xception
+    + FullyQualifiedErrorId : NativeCommandError
  
   Creating an optimized production build ...
-Γ£ô Compiled successfully in 16.8s
+Γ£ô Compiled successfully in 17.1s
   Running TypeScript ...
 Failed to compile.
 
-./src/app/dashboard/invoices/[id
-]/page.tsx:40:35
-Type error: Type 'string' is 
-not assignable to type 'MouseEve
-ntHandler<HTMLButtonElement>'.
+./src/auth.config.ts:37:9
+Type error: Type 'string' is not assignable to type 'Role'.
 
-[0m [90m 38 |[39m     
-[33m<[39m[33mdiv[39m classNa
-me[33m=[39m[32m"max-w-4xl 
-mx-auto space-y-8 p-8 bg-white 
-text-black shadow-lg rounded-lg 
-print:shadow-none 
-print:p-0"[39m[33m>[39m
- [90m 39 |[39m       
-[33m<[39m[33mdiv[39m 
-className[33m=[39m[32m"flex 
-justify-between items-start 
-print:hidden"[39m[33m>[39m
-[31m[1m>[22m[39m[90m 40 
-|[39m         
-[33m<[39m[33mButton[39m vari
-ant[33m=[39m[32m"outline"[39
-m onClick[33m=[39m[32m"window
-.print()"[39m className[33m=[
-39m[32m"print-button"[39m[33m
->[39m
- [90m    |[39m                
-                   
-[31m[1m^[22m[39m
- [90m 41 |[39m             
-[33m<[39m[33mPrinter[39m 
-className[33m=[39m[32m"mr-2 
-h-4 w-4"[39m 
-[33m/[39m[33m>[39m 
-[33mPrint[39m 
-[33mInvoice[39m
- [90m 42 |[39m         [33m<
-[39m[33m/[39m[33mButton[39m
-[33m>[39m
- [90m 43 |[39m       [33m<[3
-9m[33m/[39m[33mdiv[39m[33m>
-[39m[0m
-Next.js build worker exited 
-with code: 1 and signal: null
+[0m [90m 35 |[39m       [36mif[39m (token [33m&&[39m session[33m.[39muser) {
+ [90m 36 |[39m         session[33m.[39muser[33m.[39mid [33m=[39m token[33m.[39mid 
+[36mas[39m string
+[31m[1m>[22m[39m[90m 37 |[39m         session[33m.[39muser[33m.[39mrole [33m=[39m 
+token[33m.[39mrole [36mas[39m string [90m// custom property[39m
+ [90m    |[39m         [31m[1m^[22m[39m
+ [90m 38 |[39m       }
+ [90m 39 |[39m       [36mreturn[39m session
+ [90m 40 |[39m     }[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null

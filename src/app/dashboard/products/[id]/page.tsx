@@ -3,12 +3,13 @@ import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
 
 interface ProductEditPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default async function ProductEditPage({ params }: ProductEditPageProps) {
+export default async function ProductEditPage(props: ProductEditPageProps) {
+  const params = await props.params;
   const product = await db.product.findUnique({
     where: {
       id: params.id
@@ -24,12 +25,12 @@ export default async function ProductEditPage({ params }: ProductEditPageProps) 
   const formattedProduct = {
     ...product,
     price: parseFloat(product.price.toString()),
-    // Handling nulls
-    category: product.category || undefined,
-    weight: product.weight || undefined,
+    // Handling nulls - explicit nulls for form
+    category: product.category || null,
+    weight: product.weight || null,
     unit: product.unit || "g",
-    description: product.description || undefined,
-    image: product.image || undefined,
+    description: product.description || null,
+    image: product.image || null,
   }
 
   return (
