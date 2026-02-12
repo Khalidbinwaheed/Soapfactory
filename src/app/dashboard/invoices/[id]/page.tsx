@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Printer } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { PaymentStatus } from "@prisma/client"
+import { PrintButton } from "@/components/invoices/print-button"
 
 interface InvoicePageProps {
   params: {
@@ -37,9 +38,9 @@ export default async function InvoicePage({ params }: InvoicePageProps) {
   return (
     <div className="max-w-4xl mx-auto space-y-8 p-8 bg-white text-black shadow-lg rounded-lg print:shadow-none print:p-0">
       <div className="flex justify-between items-start print:hidden">
-        <Button variant="outline" onClick="window.print()" className="print-button">
-            <Printer className="mr-2 h-4 w-4" /> Print Invoice
-        </Button>
+      <div className="flex justify-between items-start print:hidden">
+        <PrintButton />
+      </div>
       </div>
 
       <div className="flex justify-between items-start border-b pb-8">
