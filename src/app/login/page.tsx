@@ -20,13 +20,10 @@ export default function LoginPage() {
         </p>
       </div>
       <LoginForm />
-      <p className="px-8 text-center text-sm text-muted-foreground">
-        <Link href="/signup" className="hover:text-brand underline underline-offset-4">
+      <p className="px-8 text-center text-sm text-muted-foreground mt-4">
+        <Link href="/register" className="hover:text-orange-500 underline underline-offset-4 transition-colors">
           Don&apos;t have an account? Sign Up
         </Link>
-      </p>
-       <p className="px-8 text-center text-xs text-muted-foreground mt-4">
-        Demo: Enter any credentials to access the dashboard
       </p>
     </AuthLayout>
   )
