@@ -149,7 +149,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Product Image</FormLabel>
+              <FormLabel>Product Image (Upload)</FormLabel>
               <FormControl>
                 <ImageUpload 
                     value={field.value || ""} 

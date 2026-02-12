@@ -17,6 +17,28 @@ import { Badge } from "@/components/ui/badge"
 
 export const columns: ColumnDef<Product & { inventory?: { quantity: number } | null }>[] = [
   {
+    accessorKey: "image",
+    header: "Image",
+    cell: ({ row }) => {
+        const image = row.getValue("image") as string
+        return (
+             <div className="relative h-10 w-10 overflow-hidden rounded-md bg-muted">
+                {image ? (
+                    <img 
+                        src={image} 
+                        alt={row.getValue("name")} 
+                        className="h-full w-full object-cover"
+                    />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400">
+                        <Box className="h-4 w-4" />
+                    </div>
+                )}
+             </div>
+        )
+    }
+  },
+  {
     accessorKey: "name",
     header: "Product",
     cell: ({ row }) => {
