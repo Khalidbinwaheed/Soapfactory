@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  CLIENT
+}
+
+enum ProductType {
+  BAR
+  LIQUID
+  ORGANIC
+  HERBAL
+}
+
+enum BatchStatus {
+  PLANNED
+  PRODUCING
+  READY
+  HOLD
+  REJECT
+  SOLD
+  OK
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  IN_PRODUCTION
+  READY
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+  OVERDUE
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  role          Role      @default(CLIENT)
+  phone         String?
+  address       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  orders        Order[]
+  notifications Notification[]
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  sku         String      @unique
+  category    String?
+  price       Decimal     @db.Decimal(10, 2)
+  weight      Float?
+  unit        String?     @default("g") // g, kg, ml, l
+  type        ProductType @default(BAR)
+  minStock    Int         @default(10)
+  image       String?
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  batches     Batch[]
+  inventory   Inventory?
+  orderItems  OrderItem[]
+  exports     Export[]
+  imports     Import[]
+}
+
+model Batch {
+  id              String      @id @default(cuid())
+  batchCode       String      @unique
+  productId       String
+  product         Product     @relation(fields: [productId], references: [id])
+  manufactureDate DateTime?
+  expiryDate      DateTime?
+  initialQty      Int
+  availableQty    Int
+  status          BatchStatus @default(PLANNED)
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  orderItems      OrderItem[]
+}
+
+model Inventory {
+  id             String   @id @default(cuid())
+  productId      String   @unique
+  product        Product  @relation(fields: [productId], references: [id])
+  quantity       Int      @default(0)
+  totalIn        Int      @default(0)
+  totalOut       Int      @default(0)
+  lastMovement   DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  status          OrderStatus @default(PENDING)
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  subtotal        Decimal     @db.Decimal(10, 2)
+  tax             Decimal     @db.Decimal(10, 2)
+  discount        Decimal     @db.Decimal(10, 2) @default(0)
+  items           OrderItem[]
+  shipment        Shipment?
+  invoice         Invoice?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  batchId   String?
+  batch     Batch?  @relation(fields: [batchId], references: [id])
+}
+
+model Import {
+  id           String   @id @default(cuid())
+  materialName String?  // Can be raw material or product
+  supplier     String?
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id])
+  quantity     Int
+  unit         String?
+  cost         Decimal? @db.Decimal(10, 2)
+  documentUrl  String?
+  date         DateTime @default(now())
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Exports track product movement to clients (fulfilled orders) or manual adjustments
+model Export {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  quantity    Int
+  clientId    String?  // Optional link to client user
+  date        DateTime @default(now())
+  documentUrl String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Shipment {
+  id             String    @id @default(cuid())
+  orderId        String    @unique
+  order          Order     @relation(fields: [orderId], references: [id])
+  carrier        String?
+  trackingNumber String?
+  status         String?   // e.g. "In Transit", "Delivered"
+  shippedDate    DateTime?
+  deliveryDate   DateTime?
+  documentUrl    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique
+  orderId       String        @unique
+  order         Order         @relation(fields: [orderId], references: [id])
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus @default(UNPAID)
+  dueDate       DateTime?
+  paidDate      DateTime?
+  pdfUrl        String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String?  // e.g. "ORDER", "STOCK", "INVOICE"
+  link      String?
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id            String   @id @default(cuid())
+  companyName   String   @default("Soap Factory ERP")
+  currency      String   @default("USD")
+  taxRate       Float    @default(0)
+  invoicePrefix String   @default("INV-")
+  lowStockLimit Int      @default(10)
+  updatedAt     DateTime @updatedAt
+}
