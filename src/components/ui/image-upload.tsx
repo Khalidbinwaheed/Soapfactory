@@ -108,7 +108,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
        <Input 
          value={value} 
          onChange={(e) => onChange(e.target.value)} 
-         placeholder="Or enter Image URL" 
+         placeholder="ENTER IMAGE URL OR UPLOAD" 
          disabled={disabled}
          className={value ? "hidden" : "block"}
        />
