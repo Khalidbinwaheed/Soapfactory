@@ -52,11 +52,26 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
         <Input id="phone" name="phone" defaultValue={client?.phone || ""} className="col-span-3" />
       </div>
 
-       <div className="grid grid-cols-4 items-center gap-4">
+      <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="address" className="text-right">
           Address
         </Label>
         <Input id="address" name="address" defaultValue={client?.address || ""} className="col-span-3" />
+      </div>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="company" className="text-right">
+          Company
+        </Label>
+        {/* Type casting to avoid potential stale type definition in editor */}
+        <Input id="company" name="company" defaultValue={(client as any)?.company || ""} className="col-span-3" />
+      </div>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="image" className="text-right">
+          Photo URL
+        </Label>
+        <Input id="image" name="image" defaultValue={(client as any)?.image || ""} placeholder="https://..." className="col-span-3" />
       </div>
 
       {!client && (

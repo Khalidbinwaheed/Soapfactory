@@ -62,8 +62,10 @@ export function Header() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            Profile
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/profile">
+                Profile
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             Settings

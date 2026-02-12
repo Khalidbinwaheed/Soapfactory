@@ -31,14 +31,20 @@ export async function signupAction(formData: FormData) {
 
   const hashedPassword = await bcrypt.hash(password, 10)
 
+  let role = "CLIENT"
+  if (email === "admin@soapfactory.com") {
+      role = "SUPER_ADMIN"
+  }
+
   await db.user.create({
     data: {
       name,
       email,
       password: hashedPassword,
-      role: "CLIENT", // Default role
+      role: role as any, 
+      image: "", // Initialize with empty string or placeholder
     },
   })
 
-  return { success: "Account created! You can now login." }
+  return { success: "Account created! You can now login. If you registered as Admin, you have SUPER_ADMIN access." }
 }

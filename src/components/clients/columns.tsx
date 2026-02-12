@@ -15,7 +15,22 @@ import { ClientForm } from "./client-form"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 export const columns: ColumnDef<User>[] = [
+  {
+    id: "image",
+    header: "Image",
+    cell: ({ row }) => {
+        const user = row.original as any
+        return (
+            <Avatar className="h-9 w-9">
+                <AvatarImage src={user.image || ""} alt={user.name || ""} />
+                <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+            </Avatar>
+        )
+    }
+  },
   {
     accessorKey: "name",
     header: ({ column }) => {

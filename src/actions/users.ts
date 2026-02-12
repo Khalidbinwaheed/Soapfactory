@@ -33,10 +33,8 @@ export async function createClient(prevState: any, formData: FormData) {
     return { message: "Invalid fields", errors: validated.error.flatten().fieldErrors }
   }
 
-  const { name, email, password, phone, address, role } = validated.data
-  
-  // Basic password requirement for new users if not provided
-  const hashedPassword = await bcrypt.hash(password || "123456", 10) 
+  const { name, email, password, image, company, phone } = validated.data
+  const hashedPassword = await bcrypt.hash(password || "123456", 10)
 
   try {
     await db.user.create({
@@ -44,43 +42,20 @@ export async function createClient(prevState: any, formData: FormData) {
         name,
         email,
         password: hashedPassword,
-        phone,
-        address,
-        role: role as any,
-      },
+        role: "CLIENT",
+        image,
+        company,
+        phone
+      }
     })
     revalidatePath("/dashboard/clients")
-    return { message: "Client created successfully", success: true }
-  } catch (error) {
-    console.error(error)
-    return { message: "Failed to create client. Email might be duplicate." }
+    return { success: true, message: "Client created" }
+  } catch (e) {
+    return { message: "Failed to create client" }
   }
 }
 
 export async function updateClient(prevState: any, formData: FormData) {
-    const id = formData.get("id") as string
-    const rawData = Object.fromEntries(formData.entries())
-    const validated = userSchema.safeParse(rawData)
-
-    if (!validated.success) {
-        return { message: "Invalid fields", errors: validated.error.flatten().fieldErrors }
-    }
-
-    const { name, email, phone, address, role } = validated.data
-
-    try {
-        await db.user.update({
-            where: { id },
-            data: {
-                name,
-                email,
-                phone,
-                address,
-                role: role as any,
-            }
-        })
-        revalidatePath("/dashboard/clients")
-        return { message: "Client updated successfully", success: true }
     } catch (e) {
         return { message: "Failed to update client" }
     }
