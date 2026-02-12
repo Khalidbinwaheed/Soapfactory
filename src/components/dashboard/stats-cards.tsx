@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DollarSign, Users, Package, ShoppingCart } from "lucide-react"
 
+import { formatCurrency } from "@/lib/format"
+
 interface DashboardStatsProps {
   stats: {
     totalProducts: { value: number; change: number }
@@ -11,14 +13,6 @@ interface DashboardStatsProps {
 }
 
 export function StatsCards({ stats }: DashboardStatsProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-PK', {
-      style: 'currency',
-      currency: 'PKR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0, 
-    }).format(amount).replace('PKR', 'Rs')
-  }
 
   return (
     <>

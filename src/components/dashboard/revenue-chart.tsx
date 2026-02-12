@@ -3,6 +3,8 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+import { formatCompactNumber, formatCurrency } from "@/lib/format"
+
 interface RevenueChartProps {
   data: { name: string; total: number }[]
 }
@@ -29,10 +31,10 @@ export function RevenueChart({ data }: RevenueChartProps) {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `Rs${(value / 1000).toFixed(1)}k`}
+              tickFormatter={(value) => formatCompactNumber(value)}
             />
              <Tooltip 
-                formatter={(value: number) => [`Rs${value.toLocaleString()}`, "Revenue"]}
+                formatter={(value: any) => [formatCurrency(Number(value)), "Revenue"]}
                 labelStyle={{ color: "black" }}
             />
             <Line

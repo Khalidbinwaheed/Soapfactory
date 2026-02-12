@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+import { formatCurrency } from "@/lib/format"
+
 interface RecentOrdersProps {
   orders: {
     id: string
@@ -11,14 +13,6 @@ interface RecentOrdersProps {
 }
 
 export function RecentOrders({ orders }: RecentOrdersProps) {
-   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-PK', {
-      style: 'currency',
-      currency: 'PKR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0, 
-    }).format(amount).replace('PKR', 'Rs')
-  }
 
   const getStatusColor = (status: string) => {
       switch (status) {
