@@ -1,5 +1,7 @@
 import { db } from "@/lib/db"
 import { columns } from "@/components/exports/columns"
+
+export const dynamic = 'force-dynamic'
 import { DataTable } from "@/components/ui/data-table"
 import { ExportButton } from "@/components/exports/export-button"
 
