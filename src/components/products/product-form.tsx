@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
+import { ImageUpload } from "@/components/ui/image-upload"
 import {
   Form,
   FormControl,
@@ -148,9 +149,13 @@ export function ProductForm({ initialData }: ProductFormProps) {
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL</FormLabel>
+              <FormLabel>Product Image</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/image.jpg" {...field} />
+                <ImageUpload 
+                    value={field.value || ""} 
+                    onChange={field.onChange}
+                    disabled={isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

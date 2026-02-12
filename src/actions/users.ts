@@ -56,7 +56,36 @@ export async function createClient(prevState: any, formData: FormData) {
 }
 
 export async function updateClient(prevState: any, formData: FormData) {
-    } catch (e) {
-        return { message: "Failed to update client" }
-    }
+  const id = formData.get("id") as string
+  const rawData = Object.fromEntries(formData.entries())
+  const validated = userSchema.safeParse(rawData)
+
+  if (!validated.success) {
+      return { message: "Invalid fields" }
+  }
+
+  const { name, email, password, image, company, phone } = validated.data
+  
+  const dataToUpdate: any = {
+      name,
+      email,
+      image,
+      company,
+      phone
+  }
+
+  if (password && password.length > 0) {
+      dataToUpdate.password = await bcrypt.hash(password, 10)
+  }
+
+   try {
+    await db.user.update({
+      where: { id },
+      data: dataToUpdate
+    })
+    revalidatePath("/dashboard/clients")
+    return { success: true, message: "Client updated" }
+  } catch (e) {
+    return { message: "Failed to update client" }
+  }
 }

@@ -1,6 +1,4 @@
 import { getClients } from "@/actions/users"
-import { columns } from "@/components/clients/columns"
-import { DataTable } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import {
@@ -12,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { ClientForm } from "@/components/clients/client-form"
+import { ClientsClient } from "@/components/clients/clients-client"
 
 export default async function ClientsPage() {
   const clients = await getClients()
@@ -37,7 +36,7 @@ export default async function ClientsPage() {
             </DialogContent>
         </Dialog>
       </div>
-      <DataTable columns={columns} data={clients} searchKey="name" />
+      <ClientsClient data={clients as any} />
     </div>
   )
 }

@@ -1,12 +1,13 @@
 "use client"
 
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient, updateClient } from "@/actions/users"
 import { User } from "@prisma/client"
 import { toast } from "sonner"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 interface ClientFormProps {
   client?: User
@@ -15,6 +16,7 @@ interface ClientFormProps {
 
 export function ClientForm({ client, onSuccess }: ClientFormProps) {
   const [state, action, isPending] = useActionState(client ? updateClient : createClient, null)
+  const [imageUrl, setImageUrl] = useState<string>((client as any)?.image || "")
 
   useEffect(() => {
     if (state?.success) {
@@ -69,9 +71,16 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
 
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="image" className="text-right">
-          Photo URL
+          Photo
         </Label>
-        <Input id="image" name="image" defaultValue={(client as any)?.image || ""} placeholder="https://..." className="col-span-3" />
+        <div className="col-span-3">
+             <ImageUpload 
+                value={imageUrl} 
+                onChange={setImageUrl}
+                disabled={isPending}
+             />
+             <input type="hidden" name="image" value={imageUrl} />
+        </div>
       </div>
 
       {!client && (

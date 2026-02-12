@@ -1,6 +1,5 @@
 import { getShipments } from "@/actions/shipping"
-import { DataTable } from "@/components/ui/data-table"
-import { columns } from "@/components/shipments/columns" // Import strictly typed columns
+import { ShipmentsClient } from "@/components/shipments/shipments-client"
 
 export default async function ShipmentsPage() {
     const shipments = await getShipments()
@@ -10,7 +9,7 @@ export default async function ShipmentsPage() {
             <div className="flex items-center justify-between">
                 <h1 className="text-lg font-semibold md:text-2xl">Shipments</h1>
             </div>
-            <DataTable columns={columns} data={shipments} searchKey="order.orderNumber" />
+            <ShipmentsClient data={shipments as any} />
         </div>
     )
 }
