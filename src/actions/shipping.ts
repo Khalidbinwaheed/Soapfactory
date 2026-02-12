@@ -14,6 +14,24 @@ const shipmentSchema = z.object({
   deliveryDate: z.string().optional(),
 })
 
+export async function getShipments() {
+  try {
+    const shipments = await db.shipment.findMany({
+        include: {
+            order: {
+                include: {
+                    user: true
+                }
+            }
+        },
+        orderBy: { createdAt: 'desc' }
+    })
+    return shipments
+  } catch (e) {
+      return []
+  }
+}
+
 export async function updateShipmentAction(prevState: any, formData: FormData) {
     const rawData = Object.fromEntries(formData.entries())
     const validated = shipmentSchema.safeParse(rawData)
@@ -59,5 +77,6 @@ export async function updateShipmentAction(prevState: any, formData: FormData) {
     }
 
     revalidatePath(`/dashboard/orders/${orderId}`)
-    return { message: "Shipment details saved" }
+    revalidatePath(`/dashboard/shipments`)
+    return { message: "Shipment details saved", success: true }
 }

@@ -1,0 +1,28 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useSession } from "next-auth/react"
+import { useActionState, useEffect, useContext } from "react"
+import { updateProfile, updateSystemSettings, getSystemSettings } from "@/actions/settings"
+import { toast } from "sonner"
+import { Settings } from "@prisma/client"
+
+// Wrapper to fetch data server side then pass to client forms would be better structure, but for speed mixing here or using a separate client form component
+// I will keep it simple: Page is client, but I need initial data.
+// Actually, better to fetch data in Server Component page.tsx and pass to Client Forms.
+// I'll revert this file to be the Client Form Container, and make page.tsx Server Component.
+
+// ... Wait, the tool is strictly overwriting. I should output the correct file content directly.
+// I will create `src/components/settings/settings-forms.tsx` and then update `src/app/dashboard/settings/page.tsx`
+
+// Step 1: Create Forms Component
+export {} 
