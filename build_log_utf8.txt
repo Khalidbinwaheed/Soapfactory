@@ -15,27 +15,26 @@ At line:1 char:1
     + FullyQualifiedErrorId : NativeCommandError
  
   Creating an optimized production build ...
-Γ£ô Compiled successfully in 13.9s
+Γ£ô Compiled successfully in 30.0s
   Running TypeScript ...
-Failed to compile.
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/17) ...
+Error occurred prerendering page "/dashboard/batches/new". Read more: 
+https://nextjs.org/docs/messages/prerender-error
+Error [PrismaClientInitializationError]: 
+Invalid `prisma.product.findMany()` invocation:
 
-./src/components/batches/batch-form.tsx:58:31
-Type error: Property 'initialQty' does not exist on type '{ batchCode: string; productId: string; 
-quantity: number; status: "PLANNED" | "PRODUCING" | "READY" | "HOLD" | "REJECT" | "SOLD" | "OK"; 
-manufactureDate?: string | undefined; expiryDate?: string | undefined; notes?: string | undefined; 
-} & { ...; }'.
 
-[0m [90m 56 |[39m         manufactureDate[33m:[39m initialData[33m.[39mmanufactureDate 
-[33m?[39m [36mnew[39m [33mDate[39m(initialData[33m.[39mmanufactureDate)[33m.[39mtoISOStri
-ng()[33m.[39msplit([32m'T'[39m)[[35m0[39m] [33m:[39m [32m''[39m[33m,[39m
- [90m 57 |[39m         expiryDate[33m:[39m initialData[33m.[39mexpiryDate [33m?[39m 
-[36mnew[39m [33mDate[39m(initialData[33m.[39mexpiryDate)[33m.[39mtoISOString()[33m.[39msp
-lit([32m'T'[39m)[[35m0[39m] [33m:[39m [32m''[39m[33m,[39m
-[31m[1m>[22m[39m[90m 58 |[39m         quantity[33m:[39m initialData[33m.[39minitialQty 
-[33m||[39m initialData[33m.[39mquantity[33m,[39m [90m// Use initialQty if present, 
-otherwise quantity[39m
- [90m    |[39m                               [31m[1m^[22m[39m
- [90m 59 |[39m         notes[33m:[39m initialData[33m.[39mnotes [33m||[39m [32m""[39m
- [90m 60 |[39m     } [33m:[39m {
- [90m 61 |[39m         batchCode[33m:[39m [32m""[39m[33m,[39m[0m
-Next.js build worker exited with code: 1 and signal: null
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async e (D:\Code Craft It 
+Solution\Soapfactory\.next\server\chunks\ssr\[root-of-the-server]__de0a774d._.js:1:1310) {
+  clientVersion: '6.19.2',
+  errorCode: undefined,
+  retryable: undefined,
+  digest: '1441383198'
+}
+Export encountered an error on /dashboard/batches/new/page: /dashboard/batches/new, exiting the 
+build.
+Γ¿» Next.js build worker exited with code: 1 and signal: null

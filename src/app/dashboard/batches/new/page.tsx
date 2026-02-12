@@ -1,6 +1,8 @@
 import { BatchForm } from "@/components/batches/batch-form"
 import { db } from "@/lib/db"
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewBatchPage() {
   const products = await db.product.findMany({
       orderBy: { name: 'asc' }
