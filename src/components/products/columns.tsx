@@ -26,7 +26,7 @@ export const columns: ColumnDef<Product & { inventory?: { quantity: number } | n
                 {image ? (
                     <img 
                         src={image} 
-                        alt={row.getValue("name")} 
+                        alt={row.original.name || "Product Image"}
                         className="h-full w-full object-cover"
                     />
                 ) : (
