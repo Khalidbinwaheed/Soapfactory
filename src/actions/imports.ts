@@ -2,16 +2,15 @@
 
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import { z } from "zod"
 
 const importSchema = z.object({
   materialName: z.string().optional(),
-  supplier: z.string().min(1, "Supplier is required"),
+  supplier: z.string().optional(),
   productId: z.string().optional(),
-  quantity: z.coerce.number().min(1, "Quantity must be positive"),
-  unit: z.string().default("unit"),
-  cost: z.coerce.number().min(0).optional(),
+  quantity: z.coerce.number().min(1),
+  unit: z.string().optional(),
+  cost: z.coerce.number().optional(),
   notes: z.string().optional(),
 })
 
@@ -23,48 +22,51 @@ export async function createImportAction(prevState: any, formData: FormData) {
         return { message: "Invalid fields", errors: validated.error.flatten().fieldErrors }
     }
 
-    const { productId, quantity } = validated.data
+    const { materialName, supplier, productId, quantity, unit, cost, notes } = validated.data
 
     try {
         await db.$transaction(async (tx) => {
-            // Create Import Record
-            await tx.import.create({
-                data: validated.data
-            })
+             // Create Import Record
+             await tx.import.create({
+                 data: {
+                     materialName,
+                     supplier,
+                     productId: productId || undefined,
+                     quantity,
+                     unit,
+                     cost,
+                     notes
+                 }
+             })
 
-            // Update Inventory if product is linked
-            if (productId) {
-                const inventory = await tx.inventory.findUnique({
-                    where: { productId }
-                })
-
-                if (inventory) {
-                    await tx.inventory.update({
-                        where: { productId },
-                        data: {
-                            quantity: { increment: quantity },
-                            totalIn: { increment: quantity },
-                            lastMovement: new Date()
-                        }
-                    })
-                } else {
-                     // Create inventory if missing (should exist if product exists due to our product creation logic, but good to be safe)
-                     await tx.inventory.create({
-                         data: {
-                             productId,
-                             quantity: quantity,
-                             totalIn: quantity
-                         }
-                     })
-                }
-            }
+             // Update Inventory if Product ID is present
+             if (productId) {
+                 await tx.inventory.update({
+                     where: { productId },
+                     data: {
+                         quantity: { increment: quantity },
+                         totalIn: { increment: quantity },
+                         lastMovement: new Date()
+                     }
+                 })
+             }
         })
     } catch (e) {
-        console.error(e)
-        return { message: "Failed to process import" }
+        return { message: "Failed to create import" }
     }
 
     revalidatePath("/dashboard/imports")
     revalidatePath("/dashboard/inventory")
-    redirect("/dashboard/imports")
+    return { message: "Import recorded successfully", success: true }
+}
+
+export async function getImports() {
+    try {
+        return await db.import.findMany({
+            orderBy: { date: 'desc' },
+            include: { product: true }
+        })
+    } catch (e) {
+        return []
+    }
 }

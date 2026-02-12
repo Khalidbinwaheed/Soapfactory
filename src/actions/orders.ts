@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import { OrderStatus, PaymentStatus } from "@prisma/client"
+import { logActivity } from "@/lib/activity-logger"
 
 const orderItemSchema = z.object({
   productId: z.string().min(1, "Product is required"),
@@ -22,10 +23,6 @@ const orderSchema = z.object({
 })
 
 export async function createOrderAction(prevState: any, formData: FormData) {
-    // Handling form data with nested arrays is tricky with just FormData
-    // We expect the client to JSON.stringify the items or we parse it conventionally
-    // For simplicity, let's assume client sends 'items' as a JSON string
-    
     const rawData: any = Object.fromEntries(formData.entries())
     
     if (rawData.items) {
@@ -43,17 +40,14 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     }
 
     const { userId, status, items, notes, tax, discount } = validated.data
-
-    // Calculate totals
     const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
     const totalAmount = subtotal + tax - discount
 
+    let orderId = "";
+
     try {
         await db.$transaction(async (tx) => {
-             // Generate Order Number (Simple timestamp/random based for now)
              const orderNumber = `ORD-${Date.now().toString().slice(-6)}`
-
-             // Create Order
              const order = await tx.order.create({
                  data: {
                      orderNumber,
@@ -66,8 +60,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
                      notes
                  }
              })
+             orderId = order.id;
 
-             // Create Order Items
              for (const item of items) {
                  await tx.orderItem.create({
                      data: {
@@ -78,13 +72,6 @@ export async function createOrderAction(prevState: any, formData: FormData) {
                      }
                  })
                  
-                 // Optionally reserve stock here or in a separate "Approve" step
-                 // For now, let's strictly reduce stock ONLY when status becomes SHIPPED or similar? 
-                 // Or usually when Order is PLACED. 
-                 // Let's DEDUCT stock immediately for simplicity, or we can leave it to "Fulfillment" step.
-                 // Given the prompt "Inventory Check: Create order -> Verify stock reservation/decrease"
-                 // I will decrement inventory immediately.
-                 
                  await tx.inventory.update({
                      where: { productId: item.productId },
                      data: {
@@ -94,7 +81,37 @@ export async function createOrderAction(prevState: any, formData: FormData) {
                      }
                  })
              }
+
+             // Auto Generate Invoice
+             const invoiceNumber = `INV-${orderNumber.split('-')[1]}`
+             await tx.invoice.create({
+                 data: {
+                     invoiceNumber,
+                     orderId: order.id,
+                     amount: totalAmount,
+                     status: PaymentStatus.UNPAID,
+                     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                 }
+             })
+
+             // Notification
+             await tx.notification.create({ // using tx for notification to ensure consistency? or separate? 
+                 data: {
+                     userId,
+                     title: "Order Placed",
+                     message: `Your order #${orderNumber} has been placed successfully.`,
+                     type: "ORDER",
+                     link: `/dashboard/orders/${order.id}`
+                 }
+             })
         })
+
+        // Log Activity outside transaction to avoid blocking? 
+        // We need orderId, which we got.
+        if(orderId) {
+            await logActivity(userId, "CREATED_ORDER", "ORDER", orderId, `Order placed with total ${totalAmount}`)
+        }
+
     } catch (e) {
         console.error(e)
         return { message: "Failed to create order. Check stock levels." }
@@ -106,10 +123,25 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
 export async function updateOrderStatusAction(id: string, status: OrderStatus) {
     try {
-        await db.order.update({
-            where: { id },
-            data: { status }
+        await db.$transaction(async (tx) => {
+             const order = await tx.order.update({
+                where: { id },
+                data: { status },
+                include: { user: true }
+            })
+
+            // Trigger Notification
+            await tx.notification.create({
+                data: {
+                    userId: order.userId,
+                    title: `Order ${status}`,
+                    message: `Your order #${order.orderNumber} is now ${status}.`,
+                    type: "ORDER",
+                    link: `/dashboard/orders/${order.id}`
+                }
+            })
         })
+
         revalidatePath("/dashboard/orders")
         return { message: "Order status updated" }
     } catch (e) {
@@ -117,13 +149,9 @@ export async function updateOrderStatusAction(id: string, status: OrderStatus) {
     }
 }
 
+
 export async function deleteOrderAction(id: string) {
      try {
-        // We might need to restore stock if we delete an order?
-        // For now, just delete. Real ERPs usually don't "delete" orders but cancel them.
-        // If we delete, we should ideally cascading delete items (Prisma handles if configured) 
-        // OR manually handling restoration.
-        // Let's implement Cancel instead normally, but Delete is requested generic CRUD.
         await db.order.delete({
             where: { id }
         })

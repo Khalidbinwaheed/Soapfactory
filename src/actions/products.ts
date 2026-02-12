@@ -30,7 +30,7 @@ export async function createProduct(formData: FormData) {
     type: formData.get("type"),
     minStock: formData.get("minStock"),
     description: formData.get("description"),
-    // image handling to be added (needs upload provider)
+    image: formData.get("image"),
   }
 
   const validatedFields = productSchema.safeParse(rawData)

@@ -60,6 +60,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   orders        Order[]
   notifications Notification[]
+  activityLogs  ActivityLog[]
 }
 
 model Product {
@@ -217,5 +218,17 @@ model Settings {
   taxRate       Float    @default(0)
   invoicePrefix String   @default("INV-")
   lowStockLimit Int      @default(10)
+  paymentMethods String? // Comma separated values e.g. "Cash,Bank Transfer"
   updatedAt     DateTime @updatedAt
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  action      String   // e.g. "CREATED_ORDER", "UPDATED_STOCK"
+  entityType  String   // e.g. "ORDER", "PRODUCT"
+  entityId    String?
+  details     String?
+  createdAt   DateTime @default(now())
 }

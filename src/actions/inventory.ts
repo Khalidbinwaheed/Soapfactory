@@ -3,6 +3,8 @@
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { createNotification } from "@/actions/notifications"
+import { getSystemSettings } from "@/actions/settings"
 
 const adjustmentSchema = z.object({
   id: z.string(),
@@ -12,7 +14,8 @@ const adjustmentSchema = z.object({
 })
 
 export async function adjustStockAction(prevState: any, formData: FormData) {
-    const rawData = {
+    // ... (keep existing implementation or enhance)
+     const rawData = {
         id: formData.get("id"),
         quantity: formData.get("quantity"),
         reason: formData.get("reason"),
@@ -28,23 +31,55 @@ export async function adjustStockAction(prevState: any, formData: FormData) {
     const { id, quantity, type } = validated.data
 
     try {
-        const inventory = await db.inventory.findUnique({ where: { id } })
+        const inventory = await db.inventory.findUnique({ where: { id }, include: { product: true } })
         if (!inventory) return { message: "Inventory record not found" }
 
         let newQuantity = inventory.quantity
-        if (type === "ADD") newQuantity += quantity
-        else if (type === "REMOVE") newQuantity -= quantity
-        else if (type === "SET") newQuantity = quantity
+        let totalIn = inventory.totalIn
+        let totalOut = inventory.totalOut
+
+        if (type === "ADD") {
+            newQuantity += quantity
+            totalIn += quantity
+        }
+        else if (type === "REMOVE") {
+            newQuantity -= quantity
+            totalOut += quantity
+        }
+        else if (type === "SET") {
+            // Determines if we added or removed to reach SET
+            const diff = quantity - inventory.quantity
+            if (diff > 0) totalIn += diff
+            else totalOut += Math.abs(diff)
+            newQuantity = quantity
+        }
 
         if (newQuantity < 0) return { message: "Stock cannot be negative" }
 
         await db.inventory.update({
             where: { id },
-            data: { quantity: newQuantity }
+            data: { 
+                quantity: newQuantity,
+                totalIn,
+                totalOut,
+                lastMovement: new Date()
+            }
         })
 
-        // Ideally track this adjustment in a transaction log (InventoryLog model if it existed, or Notification)
+        // Check Low Stock
+        const settings = await getSystemSettings()
+        const lowStockLimit = settings?.lowStockLimit || 10
         
+        if (newQuantity <= lowStockLimit) {
+            // Find admins to notify
+            const admins = await db.user.findMany({ where: { role: { in: ["ADMIN", "MANAGER", "SUPER_ADMIN"] } } })
+            
+            // This could be spammy if not debounced, but ok for now
+            for (const admin of admins) {
+                 await createNotification(admin.id, "Low Stock Alert", `Product ${inventory.product.name} is low on stock (${newQuantity}).`)
+            }
+        }
+
     } catch (e) {
         return { message: "Failed to update stock" }
     }
