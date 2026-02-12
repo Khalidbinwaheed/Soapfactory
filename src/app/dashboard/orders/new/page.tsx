@@ -1,6 +1,8 @@
 import { OrderForm } from "@/components/orders/order-form"
 import { db } from "@/lib/db"
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewOrderPage() {
   const products = await db.product.findMany({
       orderBy: { name: 'asc' }

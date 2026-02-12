@@ -15,11 +15,11 @@ At line:1 char:1
     + FullyQualifiedErrorId : NativeCommandError
  
   Creating an optimized production build ...
-Γ£ô Compiled successfully in 30.0s
+Γ£ô Compiled successfully in 27.6s
   Running TypeScript ...
   Collecting page data using 7 workers ...
-  Generating static pages using 7 workers (0/17) ...
-Error occurred prerendering page "/dashboard/batches/new". Read more: 
+  Generating static pages using 7 workers (0/16) ...
+Error occurred prerendering page "/dashboard/orders/new". Read more: 
 https://nextjs.org/docs/messages/prerender-error
 Error [PrismaClientInitializationError]: 
 Invalid `prisma.product.findMany()` invocation:
@@ -29,12 +29,12 @@ Can't reach database server at `localhost:5432`
 
 Please make sure your database server is running at `localhost:5432`.
     at async e (D:\Code Craft It 
-Solution\Soapfactory\.next\server\chunks\ssr\[root-of-the-server]__de0a774d._.js:1:1310) {
+Solution\Soapfactory\.next\server\chunks\ssr\[root-of-the-server]__502cb59f._.js:1:1305) {
   clientVersion: '6.19.2',
   errorCode: undefined,
   retryable: undefined,
-  digest: '1441383198'
+  digest: '3868895302'
 }
-Export encountered an error on /dashboard/batches/new/page: /dashboard/batches/new, exiting the 
+Export encountered an error on /dashboard/orders/new/page: /dashboard/orders/new, exiting the 
 build.
 Γ¿» Next.js build worker exited with code: 1 and signal: null
