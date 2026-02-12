@@ -12,8 +12,18 @@ import {
 import { ClientForm } from "@/components/clients/client-form"
 import { ClientsClient } from "@/components/clients/clients-client"
 
+export const dynamic = 'force-dynamic'
+
 export default async function ClientsPage() {
-  const clients = await getClients()
+  const clientsRaw = await getClients()
+  const clients = clientsRaw.map(client => ({
+      ...client,
+      createdAt: client.createdAt.toISOString(),
+      updatedAt: client.updatedAt.toISOString(),
+      // emailVerified: client.emailVerified?.toISOString() || null // User model in schema Step 838 DOES NOT have emailVerified? 
+      // User model: id, name, email, password, role, phone, address, image, company, isActive, createdAt, updatedAt.
+      // No emailVerified.
+  }))
 
   return (
     <div className="flex flex-col gap-4">

@@ -1,6 +1,8 @@
 import { getShipments } from "@/actions/shipping"
 import { ShipmentsClient } from "@/components/shipments/shipments-client"
 
+export const dynamic = 'force-dynamic'
+
 export default async function ShipmentsPage() {
     const shipments = await getShipments()
 

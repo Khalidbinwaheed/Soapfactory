@@ -26,7 +26,27 @@ export async function getShipments() {
         },
         orderBy: { createdAt: 'desc' }
     })
-    return shipments
+    return shipments.map(shipment => ({
+        ...shipment,
+        createdAt: shipment.createdAt.toISOString(),
+        updatedAt: shipment.updatedAt.toISOString(),
+        shippedDate: shipment.shippedDate?.toISOString() || null,
+        deliveryDate: shipment.deliveryDate?.toISOString() || null,
+        order: {
+            ...shipment.order,
+            totalAmount: shipment.order.totalAmount.toNumber(),
+            subtotal: shipment.order.subtotal.toNumber(),
+            tax: shipment.order.tax.toNumber(),
+            discount: shipment.order.discount.toNumber(),
+            createdAt: shipment.order.createdAt.toISOString(),
+            updatedAt: shipment.order.updatedAt.toISOString(),
+            user: {
+                ...shipment.order.user,
+                createdAt: shipment.order.user.createdAt.toISOString(),
+                updatedAt: shipment.order.user.updatedAt.toISOString()
+            }
+        }
+    }))
   } catch (e) {
       return []
   }

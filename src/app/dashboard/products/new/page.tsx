@@ -1,5 +1,7 @@
 import { ProductForm } from "@/components/products/product-form"
 
+export const dynamic = 'force-dynamic'
+
 export default function NewProductPage() {
   return (
     <div className="space-y-6">

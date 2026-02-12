@@ -31,6 +31,8 @@ export default async function ProductEditPage(props: ProductEditPageProps) {
     unit: product.unit || "g",
     description: product.description || null,
     image: product.image || null,
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
   }
 
   return (

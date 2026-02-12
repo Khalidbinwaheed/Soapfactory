@@ -15,6 +15,8 @@ import { redirect } from "next/navigation"
 import { ClientDashboard } from "@/components/dashboard/client-dashboard"
 import { ManagerDashboard } from "@/components/dashboard/manager-dashboard"
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const session = await auth()
   

@@ -1,13 +1,12 @@
 import { db } from "@/lib/db"
-import { columns } from "@/components/orders/columns"
-
-export const dynamic = 'force-dynamic'
-import { OrdersDataTable } from "@/components/orders/orders-data-table"
+import { OrdersClient } from "@/components/orders/orders-client"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Plus, ShoppingCart, Clock, CheckCircle } from "lucide-react"
 
 import { auth } from "@/auth"
+
+export const dynamic = 'force-dynamic'
 
 async function getOrders() {
   const session = await auth()
@@ -29,7 +28,20 @@ async function getOrders() {
       createdAt: 'desc'
     }
   })
-  return orders
+  return orders.map(order => ({
+      ...order,
+      createdAt: order.createdAt.toISOString(),
+      updatedAt: order.updatedAt.toISOString(),
+      totalAmount: order.totalAmount.toNumber(),
+      subtotal: order.subtotal.toNumber(),
+      tax: order.tax.toNumber(),
+      discount: order.discount.toNumber(),
+      user: order.user ? {
+          ...order.user,
+          createdAt: order.user.createdAt.toISOString(),
+          updatedAt: order.user.updatedAt.toISOString()
+      } : null
+  }))
 }
 
 export default async function OrdersPage() {
@@ -87,7 +99,7 @@ export default async function OrdersPage() {
             </div>
        </div>
 
-      <OrdersDataTable columns={columns} data={orders} />
+      <OrdersClient data={orders as any} />
     </div>
   )
 }

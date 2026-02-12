@@ -10,9 +10,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  eslint: {
-      ignoreDuringBuilds: true,
-  },
   typescript: {
       ignoreBuildErrors: true, // For rapid prototyping as requested
   }

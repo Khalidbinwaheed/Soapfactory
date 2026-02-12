@@ -9,6 +9,8 @@ async function getUser(id: string) {
     return await db.user.findUnique({ where: { id } })
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function SettingsPage() {
   const session = await auth()
   if (!session?.user) redirect("/login")
@@ -18,12 +20,23 @@ export default async function SettingsPage() {
 
   const settings = await getSystemSettings()
 
+  const sanitizedUser = {
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString()
+  }
+
+  const sanitizedSettings = settings ? {
+      ...settings,
+      updatedAt: settings.updatedAt.toISOString()
+  } : null
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
       </div>
-      <SettingsForms user={user} initialSettings={settings} />
+      <SettingsForms user={sanitizedUser as any} initialSettings={sanitizedSettings as any} />
     </div>
   )
 }

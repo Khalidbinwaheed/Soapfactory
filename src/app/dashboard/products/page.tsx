@@ -1,12 +1,12 @@
+import { ProductsClient } from "@/components/products/products-client"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Plus } from "lucide-react"
+
 import { db } from "@/lib/db"
 import { Product } from "@prisma/client"
 
 export const dynamic = 'force-dynamic'
-import { columns } from "@/components/products/columns"
-import { ProductsDataTable } from "@/components/products/products-data-table"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Plus } from "lucide-react"
 
 async function getProducts() {
   const products = await db.product.findMany({
@@ -17,7 +17,26 @@ async function getProducts() {
       createdAt: 'desc'
     }
   })
-  return products
+  return products.map(product => ({
+    id: product.id,
+    name: product.name,
+    sku: product.sku,
+    category: product.category,
+    price: product.price.toNumber(),
+    weight: product.weight,
+    unit: product.unit,
+    type: product.type,
+    minStock: product.minStock,
+    image: product.image,
+    description: product.description,
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
+    inventory: product.inventory ? {
+        ...product.inventory,
+        lastMovement: product.inventory.lastMovement.toISOString(),
+        updatedAt: product.inventory.updatedAt.toISOString()
+    } : null
+  }))
 }
 
 export default async function ProductsPage() {
@@ -40,7 +59,7 @@ export default async function ProductsPage() {
         </Button>
       </div>
       
-      <ProductsDataTable columns={columns} data={products} />
+      <ProductsClient data={products as any} />
     </div>
   )
 }

@@ -7,6 +7,8 @@ import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { cn } from "@/lib/utils"
 
+export const dynamic = 'force-dynamic'
+
 export default async function NotificationsPage() {
   const session = await auth()
   if (!session?.user) redirect("/login")

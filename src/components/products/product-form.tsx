@@ -36,8 +36,8 @@ type ProductData = {
     minStock: number | any
     description: string | null
     image: string | null
-    createdAt?: Date
-    updatedAt?: Date
+    createdAt?: string | Date
+    updatedAt?: string | Date
 }
 
 const productSchema = z.object({
