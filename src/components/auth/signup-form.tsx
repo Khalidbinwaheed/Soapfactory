@@ -14,22 +14,25 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useState, useTransition } from "react"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { signupAction } from "@/actions/auth"
 
 const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 })
 
-export function LoginForm() {
+export function SignupForm() {
   const router = useRouter()
   const [error, setError] = useState<string | undefined>("")
+  const [success, setSuccess] = useState<string | undefined>("")
   const [isPending, startTransition] = useTransition()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
@@ -37,23 +40,24 @@ export function LoginForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setError("")
+    setSuccess("")
     startTransition(async () => {
-       try {
-         const result = await signIn("credentials", {
-           email: values.email,
-           password: values.password,
-           redirect: false
-         })
+        const formData = new FormData()
+        formData.append("name", values.name)
+        formData.append("email", values.email)
+        formData.append("password", values.password)
 
-         if (result?.error) {
-           setError("Invalid email or password")
-         } else {
-           router.push("/dashboard")
-           router.refresh()
-         }
-       } catch (e) {
-         setError("Something went wrong")
-       }
+        const result = await signupAction(formData)
+
+        if (result.error) {
+            setError(result.error)
+        } else {
+            setSuccess(result.success)
+            // Optional: Redirect to login after a delay
+            setTimeout(() => {
+                router.push("/login")
+            }, 2000)
+        }
     })
   }
 
@@ -62,12 +66,25 @@ export function LoginForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input placeholder="John Doe" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Email Address</FormLabel>
               <FormControl>
-                <Input placeholder="m@example.com" {...field} />
+                <Input placeholder="name@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,8 +108,13 @@ export function LoginForm() {
                 {error}
             </div>
         )}
+        {success && (
+            <div className="bg-emerald-500/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-emerald-500">
+                {success}
+            </div>
+        )}
         <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600" disabled={isPending}>
-          {isPending ? "Logging in..." : "Sign In"}
+          {isPending ? "Creating account..." : "Sign Up"}
         </Button>
       </form>
     </Form>
