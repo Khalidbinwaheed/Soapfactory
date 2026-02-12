@@ -17,10 +17,21 @@ import { Order, OrderStatus, User } from "@prisma/client"
 
 type OrderWithUser = Order & { user: User }
 
+const statusStyles = {
+    PENDING: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200",
+    APPROVED: "bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200",
+    IN_PRODUCTION: "bg-purple-100 text-purple-800 hover:bg-purple-100 border-purple-200",
+    READY: "bg-cyan-100 text-cyan-800 hover:bg-cyan-100 border-cyan-200",
+    SHIPPED: "bg-orange-100 text-orange-800 hover:bg-orange-100 border-orange-200",
+    DELIVERED: "bg-green-100 text-green-800 hover:bg-green-100 border-green-200",
+    CANCELLED: "bg-red-100 text-red-800 hover:bg-red-100 border-red-200",
+}
+
 export const columns: ColumnDef<OrderWithUser>[] = [
   {
     accessorKey: "orderNumber",
     header: "Order #",
+    cell: ({ row }) => <span className="font-mono text-sm">{row.getValue("orderNumber")}</span>
   },
   {
     accessorKey: "user.name",
@@ -29,8 +40,8 @@ export const columns: ColumnDef<OrderWithUser>[] = [
         const user = row.original.user
         return (
             <div className="flex flex-col">
-                <span className="font-medium">{user.name}</span>
-                <span className="text-xs text-muted-foreground">{user.email}</span>
+                <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{user.name}</span>
+                <span className="text-xs text-gray-500">{user.email}</span>
             </div>
         )
     }
@@ -39,42 +50,49 @@ export const columns: ColumnDef<OrderWithUser>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.original.status
-      let variant: "default" | "secondary" | "destructive" | "outline" = "outline"
+      const status = row.original.status as keyof typeof statusStyles
+      const className = statusStyles[status] || "bg-gray-100 text-gray-800"
       
-      switch (status) {
-        case OrderStatus.PENDING: variant = "secondary"; break;
-        case OrderStatus.APPROVED: variant = "info" as any; break; // Check badge variants
-        case OrderStatus.IN_PRODUCTION: variant = "default"; break;
-        case OrderStatus.READY: variant = "default"; break;
-        case OrderStatus.SHIPPED: variant = "success" as any; break;
-        case OrderStatus.DELIVERED: variant = "success" as any; break;
-        case OrderStatus.CANCELLED: variant = "destructive"; break;
-      }
-      return <Badge variant={variant}>{status}</Badge>
+      return (
+        <Badge variant="outline" className={`rounded-md px-2.5 py-0.5 font-medium border-0 ring-1 ring-inset ${className}`}>
+           {status.replace('_', ' ')}
+        </Badge>
+      )
     }
   },
   {
     accessorKey: "totalAmount",
     header: "Total",
      cell: ({ row }) => {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(row.original.totalAmount))
+        const formatted = new Intl.NumberFormat('en-PK', { 
+            style: 'currency', 
+            currency: 'PKR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(Number(row.original.totalAmount)).replace('PKR', 'Rs')
+        
+        return <div className="font-semibold">{formatted}</div>
     }
   },
   {
     accessorKey: "createdAt",
     header: "Date",
-    cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
+    cell: ({ row }) => (
+        <span className="text-gray-500 text-sm">
+            {new Date(row.original.createdAt).toLocaleDateString()}
+        </span>
+    )
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const order = row.original
  
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
