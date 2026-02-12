@@ -55,7 +55,7 @@ export function BatchForm({ initialData, products }: BatchFormProps) {
         ...initialData,
         manufactureDate: initialData.manufactureDate ? new Date(initialData.manufactureDate).toISOString().split('T')[0] : '',
         expiryDate: initialData.expiryDate ? new Date(initialData.expiryDate).toISOString().split('T')[0] : '',
-        quantity: initialData.initialQty || initialData.quantity, // Use initialQty if present, otherwise quantity
+        quantity: initialData.quantity || 100,
         notes: initialData.notes || ""
     } : {
         batchCode: "",

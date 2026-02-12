@@ -15,20 +15,27 @@ At line:1 char:1
     + FullyQualifiedErrorId : NativeCommandError
  
   Creating an optimized production build ...
-Γ£ô Compiled successfully in 17.1s
+Γ£ô Compiled successfully in 13.9s
   Running TypeScript ...
 Failed to compile.
 
-./src/auth.config.ts:37:9
-Type error: Type 'string' is not assignable to type 'Role'.
+./src/components/batches/batch-form.tsx:58:31
+Type error: Property 'initialQty' does not exist on type '{ batchCode: string; productId: string; 
+quantity: number; status: "PLANNED" | "PRODUCING" | "READY" | "HOLD" | "REJECT" | "SOLD" | "OK"; 
+manufactureDate?: string | undefined; expiryDate?: string | undefined; notes?: string | undefined; 
+} & { ...; }'.
 
-[0m [90m 35 |[39m       [36mif[39m (token [33m&&[39m session[33m.[39muser) {
- [90m 36 |[39m         session[33m.[39muser[33m.[39mid [33m=[39m token[33m.[39mid 
-[36mas[39m string
-[31m[1m>[22m[39m[90m 37 |[39m         session[33m.[39muser[33m.[39mrole [33m=[39m 
-token[33m.[39mrole [36mas[39m string [90m// custom property[39m
- [90m    |[39m         [31m[1m^[22m[39m
- [90m 38 |[39m       }
- [90m 39 |[39m       [36mreturn[39m session
- [90m 40 |[39m     }[33m,[39m[0m
+[0m [90m 56 |[39m         manufactureDate[33m:[39m initialData[33m.[39mmanufactureDate 
+[33m?[39m [36mnew[39m [33mDate[39m(initialData[33m.[39mmanufactureDate)[33m.[39mtoISOStri
+ng()[33m.[39msplit([32m'T'[39m)[[35m0[39m] [33m:[39m [32m''[39m[33m,[39m
+ [90m 57 |[39m         expiryDate[33m:[39m initialData[33m.[39mexpiryDate [33m?[39m 
+[36mnew[39m [33mDate[39m(initialData[33m.[39mexpiryDate)[33m.[39mtoISOString()[33m.[39msp
+lit([32m'T'[39m)[[35m0[39m] [33m:[39m [32m''[39m[33m,[39m
+[31m[1m>[22m[39m[90m 58 |[39m         quantity[33m:[39m initialData[33m.[39minitialQty 
+[33m||[39m initialData[33m.[39mquantity[33m,[39m [90m// Use initialQty if present, 
+otherwise quantity[39m
+ [90m    |[39m                               [31m[1m^[22m[39m
+ [90m 59 |[39m         notes[33m:[39m initialData[33m.[39mnotes [33m||[39m [32m""[39m
+ [90m 60 |[39m     } [33m:[39m {
+ [90m 61 |[39m         batchCode[33m:[39m [32m""[39m[33m,[39m[0m
 Next.js build worker exited with code: 1 and signal: null
