@@ -13,6 +13,9 @@ export default async function ProductEditPage(props: ProductEditPageProps) {
   const product = await db.product.findUnique({
     where: {
       id: params.id
+    },
+    include: {
+        inventory: true
     }
   })
 
@@ -31,6 +34,7 @@ export default async function ProductEditPage(props: ProductEditPageProps) {
     unit: product.unit || "g",
     description: product.description || null,
     image: product.image || null,
+    availableStock: product.inventory?.quantity || 0,
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
   }

@@ -1,7 +1,7 @@
 "use client"
 
 import { createProductAction, updateProductAction } from "@/actions/products"
-import { useTransition, useState } from "react"
+import { useTransition, useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -36,6 +36,7 @@ type ProductData = {
     minStock: number | any
     description: string | null
     image: string | null
+    availableStock?: number
     createdAt?: string | Date
     updatedAt?: string | Date
 }
@@ -61,6 +62,11 @@ interface ProductFormProps {
 export function ProductForm({ initialData }: ProductFormProps) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  
+  useEffect(() => {
+    console.log("ProductForm Initialized - Version 2.0");
+    // alert("Product Form Updated Successfully!");
+  }, []);
   
   // Use a more specific type for defaultValues to satisfy Zod
   // Zod with .default() produces required properties in the inferred type.
@@ -115,6 +121,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
                 {error}
             </div>
          )}
+        <div className="text-center py-2 bg-green-500 text-white font-bold rounded-md my-2 animate-pulse">
+            !!! PRODUCT FORM UPDATED - VERSION 2.0 !!!
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2">
             <FormField
             control={form.control}
@@ -144,12 +154,24 @@ export function ProductForm({ initialData }: ProductFormProps) {
             />
         </div>
 
+        {initialData?.id && (
+            <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg flex items-center justify-between my-4">
+                <div>
+                   <p className="text-sm font-medium text-orange-800">Current Available Stock</p>
+                   <p className="text-2xl font-bold text-orange-900">{initialData.availableStock || 0} {initialData.unit || 'units'}</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-xs text-orange-600 italic font-medium underline">Live inventory tracking enabled</p>
+                </div>
+            </div>
+        )}
+
         <FormField
           control={form.control}
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Product Image (Upload)</FormLabel>
+              <FormLabel className="text-orange-600 font-bold underline">!!! PRODUCT IMAGE (UPLOAD) !!!</FormLabel>
               <FormControl>
                 <ImageUpload 
                     value={field.value || ""} 
